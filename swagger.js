@@ -10,7 +10,7 @@ const doc = {
   host: "localhost:5000",
   basePath: "/",
   schemes: ["http", "https"],
-  consumes: ["application/json"],
+  consumes: ["application/json","multipart/form-data"],
   produces: ["application/json"],
   tags: [
     {
@@ -52,10 +52,9 @@ const doc = {
       image: "string",
     },
     AddUser: {
-      name: "string",
+       name: "string",
       phone: "string",
       email: "string",
-      image: "image convert base64 string",
     },
     UpdateUser: {
       name: "string",

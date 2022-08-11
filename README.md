@@ -1,4 +1,4 @@
-# Build Api Application
+# Build Api Application Postgresql
 
 Build Api web app. This app use users and others person name ,phone,image, add and save database. This web app has a functional. 1.Signup,2.Login,3.Reset Password, 4.Add data,5.Update data,6.Delete data.
 
@@ -7,45 +7,21 @@ Build Api web app. This app use users and others person name ,phone,image, add a
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ```
-git clone https://github.com/rasel-helios/build-api-server-side.git
+git clone https://github.com/rasel-helios/build-api-server-postgresql.git
 
 ```
-
-## Folder structure
-
-#### `build-api-server-side` - Holds the server application
-
-- #### `config` - This holds our configuration files, like config,db
-- #### `controllers` - These hold all of the callback functions that each route will call
-- #### `Middleware` - This holds our middleware functions
-- #### `models` - This holds all of our data models
-- #### `routes` - This holds all of our HTTP to URL path associations for each unique url
-- #### `utils` - This holds all of our common functions
-- #### `views` - This holds all template engine file
-
-- #### `env` - All of our environment variables are accessible
-
-- #### `.gitignore` - Tells git which files to ignore
-
-- #### `app` - This holds all of our application configuration
-
-- #### `package.json` - This holds all of our package.json configuration
-
-- #### `swagger-outputfile` - This holds all of our swagger output files
-
-- #### `swagger`- This holds all of our swagger configuration
-
-- #### `README` - This file!
 
 ## Environment Variables
 
 ```
-DB_USER
-DB_PASS
+PG_USER
+PG_HOST
+PG_DATABASE
+PG_PASSWORD
+PG_PORT
+PG_DIALECT
 
 SECRET_KEY
-
-DB_URL
 
 NODE_MAILER_SERVICE
 
@@ -54,6 +30,28 @@ NODE_MAILER_USER
 NODE_MAILER_PASS
 
 NODE_MAILER_FROM
+
+GOOGLE_CLIENT_ID
+
+GOOGLE_CLIENT_SECRET
+
+FACEBOOK_APP_ID
+
+FACEBOOK_APP_SECRET
+
+LINKEDIN_KEY
+
+LINKEDIN_SECRET
+
+GITHUB_CLIENT_ID
+
+GITHUB_CLIENT_SECRET
+
+CLIENT_SIDE_URL
+
+SERVER_SIDE_URL
+
+COOKIE_SECRET
 
 ```
 
@@ -70,24 +68,26 @@ The things you need before installing the software.
 npm install
 ```
 
-```
-npm run  start-dev
-```
-
-Runs the server app in development mode.<br>
-Open [http://localhost:5000](http://localhost:5000) to view the client in the browser.
-
 ### Swagger Auto Generated Documentation
 
 ```
 npm run swagger
 ```
 
-Again run the server
+```
+npm run migrate
+```
+
 
 ```
 npm run start-dev
 ```
+
+
+Runs the server app in development mode.<br>
+Open [http://localhost:5000](http://localhost:5000) to view the client in the browser.
+
+
 
 Go to the url and show the generated documentation
 .<br>

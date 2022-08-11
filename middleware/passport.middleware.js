@@ -22,6 +22,10 @@ passport.use(
           User.create({
             email: profile.emails[0].value,
             socialId: profile.id,
+          }).then((users) => {
+            return cb(null, users);
+          }).catch((err) => {
+            return cb(null, err);
           })
         } else {
           // if we find an user just return return user
@@ -51,6 +55,10 @@ passport.use(
           User.create({
             email: profile.emails[0].value,
             socialId: profile.id,
+          }).then((users) => {
+            return cb(null, users);
+          }).catch((err) => {
+            return cb(null, err);
           })
         } else {
           // if we find an user just return return user
@@ -81,6 +89,10 @@ passport.use(
           User.create({
             email: profile.emails[0].value,
             socialId: profile.id,
+          }).then((users) => {
+            return cb(null, users);
+          }).catch((err) => {
+            return cb(null, err);
           })
         } else {
           // if we find an user just return return user
@@ -98,7 +110,8 @@ passport.use(
 passport.use(new GitHubStrategy({
     clientID:config.github_login.github_id,
     clientSecret:config.github_login.github_secret,
-    callbackURL: `${config.server_side_url}/auth/github/callback`,
+  callbackURL: `${config.server_side_url}/auth/github/callback`,
+    scope: ["user:email"],
   },
   function(accessToken, refreshToken, profile, cb) {
    User.findOne({where:{ socialId: profile.id }}).then(function (user) {
@@ -107,6 +120,10 @@ passport.use(new GitHubStrategy({
           User.create({
             email: profile.emails[0].value,
             socialId: profile.id,
+          }).then((users) => {
+            return cb(null, users);
+          }).catch((err) => {
+            return cb(null, err);
           })
         } else {
           // if we find an user just return return user

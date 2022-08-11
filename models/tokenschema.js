@@ -1,20 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
-  const tokenSchema = sequelize.define('token', {
-  userId: {
-    allowNull: false,
-       
-        type: Sequelize.INTEGER,
-         required: true,
-    
-  },
-  token: {
-    type: Sequelize.STRING,
-    required: true,
-  },
-  createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
+  const tokenSchema = sequelize.define('Token', {
+    email: Sequelize.STRING,
+    token: Sequelize.STRING,
+    expiration: Sequelize.DATE,
+    used:Sequelize.INTEGER
 });
   return tokenSchema;
 };
+
+
+

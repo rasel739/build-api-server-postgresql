@@ -1,11 +1,14 @@
 const db = require('../models');
-const SignupSchema = require("../models/signup")(db.sequelize, db.Sequelize);
+const User = require("../models/signup")(db.sequelize, db.Sequelize);
 const Token = require("../models/tokenschema")(db.sequelize,db.Sequelize);
 const sendEmail = require("../utils/sendMail");
 const crypto = require("crypto");
-const Joi = require("joi");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
+
 
 const PasswordReset = async (req, res) => {
   // #swagger.tags = ['Reset password']
@@ -14,43 +17,53 @@ const PasswordReset = async (req, res) => {
                 description: 'Send reset password email.',
                 schema: { $ref: '#/definitions/ResetPasswordSendEmail' }
         } */
-  try {
-    const schema = Joi.object({ email: Joi.string().email().required() });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    await SignupSchema.findOne({ where: { email: req.body.email } }).then((user) => {
-       if (!user)
-        return res.status(400).send("user with given email doesn't exist");
-       Token.findOne({ where: { userId: user.id } }).then((token) => {
-        if (!token) {
-      token = Token.create({
-        userId: user.id,
-        token: crypto.randomBytes(32).toString("hex"),
-      })
-      }
-      const link = `http://localhost:3000/resetPassword/${user?.id}/${token?.token}`;
-   sendEmail(user.email, "Your password has been reset", link);
-
-    res.send("password reset link sent to your email account");
-       }).catch((err) => {
-        console.log(err)
-      })
-    
-    }).catch((err) => {
-      console.log(err.message)
-    })
-   
-
-   
+ 
   
-    
-  } catch (error) {
-    res.send({
-      email: "Please enter your valid email address",
-      error: error.message,
-    });
+  let email = await User.findOne({where: { email: req.body.email }});
+  if (email == null) {
+ 
+    return res.json({status: 'ok'});
   }
+  
+  await Token.update({
+      used: 1
+    },
+    {
+      where: {
+        email: req.body.email
+      }
+  });
+ 
+  //Create a random reset token
+  let fpSalt = crypto.randomBytes(64).toString('hex');
+ 
+  //token expires after one hour
+  let expireDate = new Date(new Date().getTime() + (60 * 60 * 1000))
+ 
+  //insert token data into DB
+  await Token.create({
+    email: req.body.email,
+    expiration: expireDate,
+    token: fpSalt,
+    used: 0
+  }).then((token) => {
+    
+    const link = `http://localhost:3000/resetPassword/${token.token}`;
+   sendEmail(token.email, "Your password has been reset", link);
+
+  }).catch((err) => {
+    
+    console.log(err)
+  })
+ 
+   
+ 
+  return res.json({status: 'ok'});
+  
+  
+     
+
+    
 };
 
 const passwordResetConfirmation = async (req, res) => {
@@ -60,34 +73,60 @@ const passwordResetConfirmation = async (req, res) => {
                 description: 'Set new password.',
                 schema: { $ref: '#/definitions/ResetPasswordSet' }
         } */
-  try {
-    const schema = Joi.object({ password: Joi.string().required() });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    const user = await SignupSchema.findById(req.params.userId);
-    if (!user) return res.status(400).send("invalid link or expired");
-
-    const token = await Token.findOne({where:{
-      userId: user.id,
-      token: req.params.token,
-    }});
-    if (!token) return res.status(400).send("Invalid link or expired");
-    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-       user.password =hash ;
-     user.save();
-    token.delete();
-
-    res.send("password reset sucessfully.");
-});
-
-    
-  } catch (error) {
-    res.send({
-      message: "Please check your email and try again valid userId and token",
-      error: error.message,
-    });
+  
+  //compare passwords
+  // if (req.body.password1 !== req.body.password2) {
+  //   return res.json({status: 'error', message: 'Passwords do not match. Please try again.'});
+  // }
+ 
+  /**
+  * Ensure password is valid (isValidPassword
+  * function checks if password is >= 8 chars, alphanumeric,
+  * has special chars, etc)
+  **/
+  // if (!isValidPassword(req.body.password)) {
+  //   return res.json({status: 'error', message: 'Password does not meet minimum requirements. Please try again.'});
+  // }
+ 
+  let record = await Token.findOne({
+    where: {
+      email: req.body.email,
+      expiration: { [Op.gt]: Sequelize.fn('CURDATE')},
+      token: req.body.token,
+      used: 0
+    }
+  });
+ 
+  if (record == null) {
+    return res.json({status: 'error', message: 'Token not found. Please try the reset password process again.'});
   }
+ 
+  let upd = await Token.update({
+      used: 1
+    },
+    {
+      where: {
+        email: req.body.email
+      }
+  });
+ 
+ bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+     User.update({
+    password:hash,
+    
+  },
+  {
+    where: {
+      email: req.body.email
+    }
+  });
+ 
+  return res.json({status: 'ok', message: 'Password reset. Please login with your new password.'});
+});
+  
 };
 
 module.exports = { PasswordReset, passwordResetConfirmation };
+
+
+

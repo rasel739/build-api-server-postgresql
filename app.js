@@ -13,6 +13,7 @@ require("./middleware/passport.middleware");
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const userLoginData = require("./service/userauth.service");
+const path = require('path');
 const app = express();
 
 app.use(cors());
@@ -47,7 +48,7 @@ app.get(
     failureRedirect: `${config.client_side_url}/login`,
   }),
   (req, res) => {
-    console.log(req.user)
+   
     userLoginData(req, res);
   }
 );
@@ -109,13 +110,14 @@ app.use(
   passport.authenticate("jwt", { session: false }),
   userRouter
 );
+
 app.use("/user-signup", singupRouter);
 app.use("/login-user", loginUser);
 app.use("/reset-password", resetPassword);
 //get server home page
 app.get("/", (req, res) => {
   // #swagger.ignore = true
-
+   
   res.sendFile(__dirname + "/./views/index.html");
   // res.render('email');
 });

@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const SignupSchema = sequelize.define('Signup', {
+  const UserSchema = sequelize.define('User', {
   socialId: {
         type: Sequelize.STRING,
         
@@ -21,5 +21,5 @@ module.exports = (sequelize, Sequelize) => {
     defaultValue:null,
   }
 });
-  return SignupSchema;
+  return UserSchema;
 };

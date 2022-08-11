@@ -1,6 +1,5 @@
-
 module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define('User', {
+  const Userdata = sequelize.define('Userdata', {
     name: {
       type: Sequelize.STRING,
       
@@ -24,11 +23,9 @@ module.exports = (sequelize, Sequelize) => {
     
   },
   image: {
-    type: Sequelize.BLOB('long'),
-    defaultValue:null,
+    type: Sequelize.STRING,
+    defaultValue:null
   }
 });
-  return User;
+  return Userdata;
 };
-
-

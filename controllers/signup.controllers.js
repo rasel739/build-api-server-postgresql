@@ -17,7 +17,7 @@ const createSignup = async (req, res) => {
         } */
   const { email, password } = req.body;
 
-   console.log(req.body)
+  
   const subject = "Signup  email confirmation";
   const text =
     "Hello, Thank you for creating your Build API account.We look forward to readingyour posts and hope you will enjoy the space that we created for our customers.The  team";
