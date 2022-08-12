@@ -96,12 +96,23 @@ const updateUserData = async (req, res) => {
 const deleteUserData = async (req, res) => {
   // #swagger.tags = ['User data']
 
-  await User.destroy({ where: { id: req.params.id } }).then((user) => {
+  const findUser = await User.findOne({where:{id:req.params.id}});
+
+  if(findUser){
+    await User.destroy({ where: { id: req.params.id } }).then((user) => {
+    if(user=== 1){
+      res.status(200).json({ id: Number(req.params.id),
+      message: "User deleted successfully",})
+    }
     
-    res.status(200).json(user===1&&req.params.id)
   }).catch((error) => {
-    res.status(500).json({message:'User not find and not delete user'})
+    res.status(500).json({message:'User not delete user'})
   })
+  }else{
+    res.status(404).json({message:'User not found!'})
+  }
+
+ 
  
 };
 
