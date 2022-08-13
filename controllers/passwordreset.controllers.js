@@ -5,8 +5,6 @@ const sendEmail = require("../utils/sendMail");
 const crypto = require("crypto");
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
 
 
 
@@ -48,7 +46,7 @@ const PasswordReset = async (req, res) => {
     used: 0
   }).then((token) => {
     
-    const link = `http://localhost:3000/resetPassword/${token.token}`;
+    const link = `http://localhost:3000/resetPassword/${token.email}/${token.token}`;
    sendEmail(token.email, "Your password has been reset", link);
 
   }).catch((err) => {
@@ -74,31 +72,18 @@ const passwordResetConfirmation = async (req, res) => {
                 schema: { $ref: '#/definitions/ResetPasswordSet' }
         } */
   
-  //compare passwords
-  // if (req.body.password1 !== req.body.password2) {
-  //   return res.json({status: 'error', message: 'Passwords do not match. Please try again.'});
-  // }
- 
-  /**
-  * Ensure password is valid (isValidPassword
-  * function checks if password is >= 8 chars, alphanumeric,
-  * has special chars, etc)
-  **/
-  // if (!isValidPassword(req.body.password)) {
-  //   return res.json({status: 'error', message: 'Password does not meet minimum requirements. Please try again.'});
-  // }
+  
  
   let record = await Token.findOne({
     where: {
-      email: req.body.email,
-      expiration: { [Op.gt]: Sequelize.fn('CURDATE')},
-      token: req.body.token,
+      email: req.params.email,
+      token: req.params.token,
       used: 0
     }
   });
  
   if (record == null) {
-    return res.json({status: 'error', message: 'Token not found. Please try the reset password process again.'});
+    res.json({status: 'error', message: 'Token not found. Please try the reset password process again.'});
   }
  
   let upd = await Token.update({
@@ -106,23 +91,30 @@ const passwordResetConfirmation = async (req, res) => {
     },
     {
       where: {
-        email: req.body.email
+        email: req.params.email
       }
   });
  
  bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
-     User.update({
+    User.update({
     password:hash,
     
   },
   {
     where: {
-      email: req.body.email
+      email: req.params.email
     }
-  });
- 
-  return res.json({status: 'ok', message: 'Password reset. Please login with your new password.'});
+  }).then((pass)=>{
+   console.log('password reset')
+res.json({status: 'ok', message: 'Password reset. Please login with your new password.'});
+  }).catch((error)=>{
+    console.log('password not reset')
+  })
 });
+
+ 
+ 
+  
   
 };
 
